@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Shield, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowLeft, ShieldCheck, KeyRound } from "lucide-react";
+import {
+  Shield, Lock, Mail, Eye, EyeOff, AlertCircle,
+  ArrowLeft, ShieldCheck, Sparkles, KeyRound, Zap
+} from "lucide-react";
 import { adminLoginUser } from "@/services/api";
 
 export default function AdminLogin() {
@@ -11,196 +14,258 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleAdminSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const res = await adminLoginUser(email, password);
-
       if (res.token && res.user) {
         if (res.user.role !== "admin") {
-          setError("Access Denied: Admin privileges required. Normal student accounts cannot log in here.");
+          setError("Access Denied: Admin privileges required for this portal.");
           setLoading(false);
           return;
         }
-
-        // Store credentials
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-
-        // Navigate to Admin Dashboard
         navigate("/admin");
       } else {
-        setError(res.message || "Invalid admin credentials.");
+        setError(res.message || "Invalid admin credentials. Please try again.");
       }
     } catch (err) {
-      console.error("Admin login error:", err);
-      setError("Server error. Please verify backend connection.");
+      setError("Server connection error. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 transition-colors duration-300 relative overflow-hidden"
-      style={{
-        backgroundColor: "#12192B",
-        color: "#FBFAF6",
-        fontFamily: "'Inter', sans-serif"
-      }}
-    >
-      {/* Background Decorative Ambient Gradients */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
+    <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ backgroundColor: "#060813" }}>
 
-      {/* Main Glass Card */}
-      <div className="max-w-md w-full relative z-10 space-y-6">
-        {/* Back Link */}
-        <div className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs font-semibold opacity-70 hover:opacity-100 hover:-translate-x-1 transition-all"
-          >
-            <ArrowLeft size={16} /> Return to Campus Connect
-          </Link>
-          <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
-            Admin Access Only
-          </span>
-        </div>
+      {/* Animated background blobs */}
+      <div style={{
+        position: "absolute", top: "15%", left: "10%",
+        width: 420, height: 420,
+        background: "radial-gradient(circle, rgba(101,70,219,0.18) 0%, transparent 70%)",
+        borderRadius: "50%", filter: "blur(40px)", pointerEvents: "none"
+      }} />
+      <div style={{
+        position: "absolute", bottom: "10%", right: "8%",
+        width: 360, height: 360,
+        background: "radial-gradient(circle, rgba(142,90,239,0.15) 0%, transparent 70%)",
+        borderRadius: "50%", filter: "blur(50px)", pointerEvents: "none"
+      }} />
+      <div style={{
+        position: "absolute", top: "50%", right: "25%",
+        width: 200, height: 200,
+        background: "radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%)",
+        borderRadius: "50%", filter: "blur(30px)", pointerEvents: "none"
+      }} />
 
-        {/* Header Branding */}
-        <div
-          className="p-8 sm:p-10 rounded-3xl border shadow-2xl space-y-6 backdrop-blur-xl relative overflow-hidden"
-          style={{
-            borderColor: "#E4E0D3",
-            backgroundColor: "#0F1624"
-          }}
+      <div className="relative z-10 w-full max-w-md space-y-4">
+
+        {/* Back link */}
+        <Link to="/signin"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
+          style={{ color: "#94A3B8" }}
+          onMouseOver={e => e.currentTarget.style.color = "#fff"}
+          onMouseOut={e => e.currentTarget.style.color = "#94A3B8"}
         >
-          <div className="text-center space-y-3">
-            <div className="inline-flex p-4 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-lg">
-              <Shield size={36} />
+          <ArrowLeft size={14} /> Back to Student Login
+        </Link>
+
+        {/* CARD */}
+        <div style={{
+          backgroundColor: "#0E1028",
+          border: "1px solid rgba(101,70,219,0.25)",
+          borderRadius: 28,
+          padding: "32px 28px",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(101,70,219,0.1)"
+        }}>
+
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <div style={{
+              display: "inline-flex", padding: 14, borderRadius: 20, marginBottom: 16,
+              background: "linear-gradient(135deg, rgba(101,70,219,0.2), rgba(142,90,239,0.15))",
+              border: "1px solid rgba(101,70,219,0.3)",
+              boxShadow: "0 0 30px rgba(101,70,219,0.2)"
+            }}>
+              <Shield size={32} color="#8E5AEF" />
             </div>
-            <h1
-              className="text-2xl sm:text-3xl font-black tracking-tight"
-              style={{ fontFamily: "'Fraunces', serif" }}
-            >
-              Admin Portal Login
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "3px 10px", borderRadius: 20, marginBottom: 12,
+              background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)"
+            }}>
+              <Zap size={10} color="#ef4444" />
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#ef4444", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                Restricted Access
+              </span>
+            </div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
+              Admin Control Center
             </h1>
-            <p className="text-xs opacity-75 max-w-xs mx-auto leading-relaxed">
-              Authorized System Administrators & Campus Moderation Command Panel
+            <p style={{ fontSize: 12, color: "#94A3B8", margin: 0 }}>
+              Campus360 System Administration Portal
             </p>
           </div>
 
-          {/* Alert Message */}
+          {/* Error */}
           {error && (
-            <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium flex items-start gap-3 animate-in fade-in duration-200">
-              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+            <div style={{
+              padding: "10px 14px", borderRadius: 12, marginBottom: 16,
+              background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
+              display: "flex", alignItems: "center", gap: 8,
+              color: "#f87171", fontSize: 12, fontWeight: 600
+            }}>
+              <AlertCircle size={15} style={{ flexShrink: 0 }} />
               <span>{error}</span>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleAdminSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="block text-[11px] font-bold uppercase tracking-wider opacity-75">
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Email */}
+            <div>
+              <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
                 Admin Email Address
               </label>
-              <div className="relative">
-                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-50 text-amber-400" />
+              <div style={{ position: "relative" }}>
+                <Mail size={15} style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "#475569" }} />
                 <input
                   type="email"
                   required
                   placeholder="admin@campus360.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-2xl text-xs border focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
                   style={{
-                    borderColor: "#E4E0D3",
-                    backgroundColor: "#182238",
-                    color: "#FBFAF6"
+                    width: "100%", paddingLeft: 38, paddingRight: 14, paddingTop: 11, paddingBottom: 11,
+                    borderRadius: 12, fontSize: 12, backgroundColor: "#070918",
+                    border: "1px solid rgba(101,70,219,0.25)", color: "#fff",
+                    outline: "none", boxSizing: "border-box"
                   }}
+                  onFocus={e => e.target.style.borderColor = "rgba(101,70,219,0.6)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(101,70,219,0.25)"}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-[11px] font-bold uppercase tracking-wider opacity-75">
+            {/* Password */}
+            <div>
+              <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
                 Admin Password
               </label>
-              <div className="relative">
-                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-50 text-amber-400" />
+              <div style={{ position: "relative" }}>
+                <Lock size={15} style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "#475569" }} />
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-11 py-3 rounded-2xl text-xs border focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
                   style={{
-                    borderColor: "#E4E0D3",
-                    backgroundColor: "#182238",
-                    color: "#FBFAF6"
+                    width: "100%", paddingLeft: 38, paddingRight: 44, paddingTop: 11, paddingBottom: 11,
+                    borderRadius: 12, fontSize: 12, backgroundColor: "#070918",
+                    border: "1px solid rgba(101,70,219,0.25)", color: "#fff",
+                    outline: "none", boxSizing: "border-box"
                   }}
+                  onFocus={e => e.target.style.borderColor = "rgba(101,70,219,0.6)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(101,70,219,0.25)"}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100"
+                  style={{
+                    position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer", color: "#475569", padding: 2
+                  }}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-6 rounded-2xl text-xs font-black uppercase tracking-wider shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
               style={{
-                backgroundColor: "#CB9A2E",
-                color: "#FFFFFF"
+                width: "100%", padding: "13px 0", borderRadius: 14, fontSize: 12,
+                fontWeight: 700, border: "none", cursor: loading ? "not-allowed" : "pointer",
+                background: loading ? "#334155" : "linear-gradient(135deg, #6546DB, #8E5AEF)",
+                color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                boxShadow: loading ? "none" : "0 4px 20px rgba(101,70,219,0.4)",
+                transition: "all 0.2s", marginTop: 4
               }}
             >
               {loading ? (
-                <span>Authenticating Admin...</span>
-              ) : (
                 <>
-                  <ShieldCheck size={18} /> Authenticate Admin Access
+                  <span style={{
+                    width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)",
+                    borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite",
+                    display: "inline-block"
+                  }} />
+                  Authenticating...
                 </>
+              ) : (
+                <><ShieldCheck size={16} /> Authenticate & Access Admin</>
               )}
             </button>
           </form>
 
-          {/* Quick Demo Fill Helper */}
-          <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center space-y-1.5">
-            <p className="text-[11px] font-bold text-amber-400">Default Admin Credentials</p>
-            <p className="text-[10px] opacity-75 font-mono">admin@campus360.edu • admin123</p>
+          {/* Demo credentials box */}
+          <div style={{
+            marginTop: 20, padding: "14px 16px", borderRadius: 16,
+            background: "linear-gradient(135deg, rgba(101,70,219,0.08), rgba(142,90,239,0.05))",
+            border: "1px solid rgba(101,70,219,0.2)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+              <KeyRound size={12} color="#8E5AEF" />
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#8E5AEF", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Demo Credentials
+              </span>
+            </div>
+            <p style={{ fontSize: 11, color: "#64748B", fontFamily: "monospace", margin: "0 0 10px" }}>
+              admin@campus360.edu &nbsp;/&nbsp; admin123
+            </p>
             <button
               type="button"
-              onClick={() => {
-                setEmail("admin@campus360.edu");
-                setPassword("admin123");
+              onClick={() => { setEmail("admin@campus360.edu"); setPassword("admin123"); }}
+              style={{
+                padding: "6px 14px", borderRadius: 10, fontSize: 10, fontWeight: 700,
+                backgroundColor: "#6546DB", color: "#fff", border: "none", cursor: "pointer"
               }}
-              className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white hover:bg-amber-400 transition-colors shadow-sm"
             >
               Auto-Fill Credentials
             </button>
           </div>
 
-          {/* Security Notice */}
-          <div className="pt-4 border-t text-center space-y-2" style={{ borderColor: "#E4E0D3" }}>
-            <div className="flex items-center justify-center gap-1.5 text-[11px] opacity-60">
-              <KeyRound size={13} className="text-amber-400" /> Protected by Campus360 Role Guard Middleware
-            </div>
-            <p className="text-[10px] opacity-40">
-              Normal student users will be rejected automatically.
+          {/* Divider + student portal link */}
+          <div style={{ marginTop: 20, textAlign: "center" }}>
+            <p style={{ fontSize: 11, color: "#475569" }}>
+              Not an admin?{" "}
+              <Link to="/signin" style={{ color: "#8E5AEF", fontWeight: 700, textDecoration: "none" }}>
+                Student Portal →
+              </Link>
             </p>
           </div>
         </div>
+
+        {/* Footer badge */}
+        <div style={{ textAlign: "center" }}>
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: 5,
+            fontSize: 10, color: "#334155", fontWeight: 600
+          }}>
+            <Sparkles size={11} color="#6546DB" />
+            Campus360 · Secured Administration Gateway
+          </span>
+        </div>
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

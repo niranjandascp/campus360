@@ -8,6 +8,7 @@ import LostFound from "./pages/LostFound";
 import EventHub from "./pages/EventHub";
 import MessagesPage from "./pages/MessagesPage";
 import ProfilePage from "./pages/ProfilePage";
+import RoomFinder from "./pages/RoomFinder";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 
@@ -16,9 +17,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Home />} />
         <Route path="/issues" element={<Issues />} />
         <Route path="/lost-found" element={<LostFound />} />
+        <Route path="/events" element={<EventHub />} />
         <Route path="/event-hub" element={<EventHub />} />
+        <Route path="/rooms" element={<RoomFinder />} />
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profile/:identifier" element={<ProfilePage />} />

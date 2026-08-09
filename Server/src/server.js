@@ -55,9 +55,24 @@ app.use(
   "/uploads",
   express.static(path.join(process.cwd(), "uploads"))
 );
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174"
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.startsWith("http://localhost:")) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true
   })
 );
@@ -86,6 +101,6 @@ const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
   console.log(
-    `🚀Server running with Socket.io at http://localhost:${PORT}`
+    `🚀 Server running with Socket.io at http://localhost:${PORT}`
   );
 });

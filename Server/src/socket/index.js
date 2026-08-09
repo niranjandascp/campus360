@@ -8,7 +8,9 @@ const onlineUsers = new Map(); // userId -> socketId
 const initSocket = (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5173",
+      origin: (origin, callback) => {
+        callback(null, true);
+      },
       credentials: true
     }
   });
@@ -22,7 +24,7 @@ const initSocket = (httpServer) => {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_jwt_secret_campus360_super_secret");
       socket.userId = decoded.id;
       next();
     } catch (err) {

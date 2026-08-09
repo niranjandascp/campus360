@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+/* ===== DARK THEME (DEFAULT) ===== */
+:root {
+  --bg-primary: #0A0B1C;
+  --bg-secondary: #11132A;
+  --surface-card: #161836;
+  --surface-elevated: #1F2248;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+}
+
+/* ===== LIGHT THEME ===== */
+[data-theme="light"] {
+  --bg-primary: #F1F5F9;
+  --bg-secondary: #FFFFFF;
+  --surface-card: #FFFFFF;
+  --surface-elevated: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,17 +34,29 @@ body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-/* Custom Chat Scrollbar */
+/* Smooth theme transitions */
+*,
+*::before,
+*::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -33,5 +69,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.6);
+  background: rgba(101, 70, 219, 0.5);
+}
+
+/* ===== LIGHT MODE: SIDEBAR OVERRIDE ===== */
+[data-theme="light"] aside {
+  background-color: #1a1c38 !important;
+}
+
+[data-theme="light"] header {
+  background-color: #1a1c38 !important;
 }

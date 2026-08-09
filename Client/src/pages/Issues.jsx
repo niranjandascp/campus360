@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Wrench, Plus, Search, CheckCircle2, Clock, AlertTriangle, ArrowLeft, ThumbsUp, MapPin, Loader2, Edit3, Trash2, X, Upload, Image as ImageIcon } from "lucide-react";
-import { Navbar } from "@/components/ui/mini-navbar";
+import {
+  Wrench, Plus, Search, CheckCircle2, Clock, AlertTriangle, ArrowLeft,
+  ThumbsUp, MapPin, Loader2, Edit3, Trash2, X, Upload, Image as ImageIcon
+} from "lucide-react";
+import DashboardLayout from "@/components/DashboardLayout";
 import { getIssues, createIssue, updateIssue, deleteIssue, upvoteIssue, API_URL } from "@/services/api";
 
 const SERVER_BASE = API_URL.replace("/api", "");
 
 export default function Issues() {
   const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingIssue, setEditingIssue] = useState(null); // null if creating, issue object if editing
+  const [editingIssue, setEditingIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -31,9 +33,6 @@ export default function Issues() {
   const [issuesList, setIssuesList] = useState([]);
   const navigate = useNavigate();
 
-  const isDark = theme === "dark";
-
-  // Fallback demo data if DB is empty
   const demoIssues = [
     {
       _id: "demo-1",
@@ -86,7 +85,6 @@ export default function Issues() {
         setIssuesList(demoIssues);
       }
     } catch (err) {
-      console.warn("Backend issues API unavailable, displaying local state.", err);
       setIssuesList(demoIssues);
     } finally {
       setLoading(false);
@@ -104,14 +102,6 @@ export default function Issues() {
     }
     fetchIssuesData();
   }, [filter]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => {
-      const next = prev === "light" ? "dark" : "light";
-      localStorage.setItem("theme", next);
-      return next;
-    });
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -185,7 +175,6 @@ export default function Issues() {
 
     setSubmitting(true);
     try {
-      // Build FormData for image upload
       const formData = new FormData();
       formData.append("title", formTitle);
       formData.append("description", formDesc || "No description provided.");
@@ -200,14 +189,12 @@ export default function Issues() {
       }
 
       if (editingIssue) {
-        // UPDATE EXISTING ISSUE
         const res = await updateIssue(editingIssue._id, formData);
         if (res && res.issue) {
           setIssuesList((prev) =>
             prev.map((item) => (item._id === editingIssue._id ? res.issue : item))
           );
         } else {
-          // Optimistic update fallback
           setIssuesList((prev) =>
             prev.map((item) =>
               item._id === editingIssue._id
@@ -226,7 +213,6 @@ export default function Issues() {
           );
         }
       } else {
-        // CREATE NEW ISSUE
         const res = await createIssue(formData);
         if (res && res.issue) {
           setIssuesList([res.issue, ...issuesList]);
@@ -235,7 +221,6 @@ export default function Issues() {
           setSubmitting(false);
           return;
         } else {
-          // Fallback local append
           const fallbackIssue = {
             _id: `issue-${Date.now()}`,
             title: formTitle,
@@ -255,7 +240,6 @@ export default function Issues() {
 
       setIsModalOpen(false);
     } catch (err) {
-      console.error("Issue form submit error:", err);
       setErrorMsg("Failed to upload image & save issue ticket.");
     } finally {
       setSubmitting(false);
@@ -264,16 +248,11 @@ export default function Issues() {
 
   const handleDeleteIssue = async (issueId) => {
     if (!window.confirm("Are you sure you want to delete this issue ticket?")) return;
-
     setIssuesList((prev) => prev.filter((item) => item._id !== issueId));
-
     if (String(issueId).startsWith("demo")) return;
-
     try {
       await deleteIssue(issueId);
-    } catch (err) {
-      console.warn("Delete API sync failed, removed locally.", err);
-    }
+    } catch (err) {}
   };
 
   const handleUpvote = async (issueId) => {
@@ -301,13 +280,14 @@ export default function Issues() {
 
     try {
       await upvoteIssue(issueId);
-    } catch (err) {
-      console.warn("Upvote API sync failed.", err);
-    }
+    } catch (err) {}
   };
 
   const filteredIssues = issuesList.filter((issue) => {
-    const matchesFilter = filter === "all" || issue.status === filter;
+    const matchesFilter =
+      filter === "all" ||
+      issue.status === filter ||
+      (filter === "reported" && (issue.status === "open" || !issue.status));
     const matchesSearch =
       issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (issue.location?.building || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -316,197 +296,163 @@ export default function Issues() {
   });
 
   return (
-    <div
-      className={`min-h-screen w-full transition-colors duration-300 ${
-        isDark ? "bg-slate-950 text-slate-100" : "bg-[#FBFAF6] text-slate-900"
-      }`}
-    >
-      {/* Floating Navbar */}
-      <Navbar
-        activeTab="issues"
-        user={user}
-        onLogout={handleLogout}
-        onEditProfile={() => {}}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
+    <DashboardLayout user={user} onLogout={handleLogout} activeNav="my-reports">
+      {/* PAGE HEADER */}
+      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#6546DB] uppercase tracking-wider">
+            <Wrench className="w-4 h-4 text-[#6546DB]" />
+            <span>Campus Infrastructure Management</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
+            Campus Issue Tracker
+          </h1>
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-0.5 max-w-2xl">
+            Report malfunctioning campus facilities with photo proof, track repair timelines, and upvote urgent issues.
+          </p>
+        </div>
 
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
-        {/* Back navigation & Page Header */}
-        <div className="mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-indigo-500 hover:text-indigo-600 mb-4 transition-colors">
-            <ArrowLeft size={14} /> Back to Campus Overview
-          </Link>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-mono tracking-widest uppercase font-bold text-indigo-500">
-                IMAGE UPLOAD & BACKEND INTEGRATED
-              </span>
-              <h1 className="text-3xl sm:text-5xl font-bold mt-1 tracking-tight" style={{ fontFamily: "serif" }}>
-                Campus Issue Tracker
-              </h1>
-              <p className={`mt-2 text-sm sm:text-base max-w-2xl ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-                Report malfunctioning facilities with photo proof, edit ticket status, or track real-time repairs.
-              </p>
-            </div>
+        <button
+          onClick={openCreateModal}
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold shadow-md bg-gradient-to-r from-[#6546DB] to-[#8E5AEF] text-white hover:opacity-95 transition-all shrink-0"
+        >
+          <Plus size={16} /> Report New Issue
+        </button>
+      </div>
 
+      {/* FILTER & SEARCH BAR */}
+      <div className="p-4 rounded-3xl bg-[var(--surface-card)] border border-[var(--border-color)] mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+        <div className="relative w-full sm:w-80">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          <input
+            type="text"
+            placeholder="Search issues, building, or category..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[#6546DB]/50"
+          />
+        </div>
+
+        <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+          {["all", "reported", "in-progress", "resolved"].map((tab) => (
             <button
-              onClick={openCreateModal}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-semibold shadow-lg bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 transition-all"
-            >
-              <Plus size={18} /> Report New Issue
-            </button>
-          </div>
-        </div>
-
-        {/* Filter Controls Bar */}
-        <div className={`p-4 rounded-2xl border mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm ${
-          isDark ? "bg-slate-900 border-slate-800" : "bg-white border-amber-100"
-        }`}>
-          {/* Search Input */}
-          <div className="relative w-full sm:w-80">
-            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search issues, building, or category..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2 rounded-full text-sm border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                isDark ? "bg-slate-800 border-slate-700 text-white placeholder-slate-400" : "bg-gray-50 border-gray-200 text-gray-900"
+              key={tab}
+              onClick={() => setFilter(tab)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                filter === tab
+                  ? "bg-[#6546DB] text-white shadow-sm"
+                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-primary)]"
               }`}
-            />
-          </div>
-
-          {/* Status Tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-            {["all", "reported", "in-progress", "resolved"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
-                  filter === tab
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : isDark ? "text-slate-400 hover:bg-slate-800" : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                {tab === "all" ? "All Issues" : tab.replace("-", " ")}
-              </button>
-            ))}
-          </div>
+            >
+              {tab === "all" ? "All Issues" : tab.replace("-", " ")}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* Loading Spinner */}
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="animate-spin text-indigo-600" size={36} />
-          </div>
-        ) : (
-          /* Issues Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredIssues.map((issue) => {
-              const upvoteCount = issue.upvotes ? issue.upvotes.length : 0;
-              const imgSrc = issue.imageUrl
-                ? issue.imageUrl.startsWith("http")
-                  ? issue.imageUrl
-                  : `${SERVER_BASE}${issue.imageUrl}`
-                : null;
+      {/* LOADING OR GRID */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="animate-spin text-[#6546DB]" size={36} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredIssues.map((issue) => {
+            const upvoteCount = issue.upvotes ? issue.upvotes.length : 0;
+            const imgSrc = issue.imageUrl
+              ? issue.imageUrl.startsWith("http")
+                ? issue.imageUrl
+                : `${SERVER_BASE}${issue.imageUrl}`
+              : null;
 
-              return (
-                <div
-                  key={issue._id}
-                  className={`p-6 rounded-2xl border transition-all hover:shadow-xl flex flex-col justify-between overflow-hidden ${
-                    isDark ? "bg-slate-900 border-slate-800 hover:border-slate-700" : "bg-white border-amber-100 hover:border-amber-200"
-                  }`}
-                >
-                  <div>
-                    {/* Optional Image Preview Thumbnail */}
-                    {imgSrc && (
-                      <div className="w-full h-44 rounded-xl bg-gray-100 dark:bg-gray-800 mb-4 overflow-hidden relative">
-                        <img src={imgSrc} alt={issue.title} className="w-full h-full object-cover" />
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-full uppercase border ${
-                        issue.status === "resolved"
-                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                          : issue.status === "in-progress"
-                          ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                          : "bg-indigo-500/10 text-indigo-500 border-indigo-500/20"
-                      }`}>
-                        {issue.status || "reported"}
-                      </span>
-
-                      {/* Edit & Delete Action Buttons */}
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => openEditModal(issue)}
-                          className="p-1.5 rounded-lg border border-indigo-500/20 bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all"
-                          title="Edit / Update Issue"
-                        >
-                          <Edit3 size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteIssue(issue._id)}
-                          className="p-1.5 rounded-lg border border-red-500/20 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
-                          title="Delete Issue Ticket"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+            return (
+              <div
+                key={issue._id}
+                className="p-5 rounded-3xl bg-[var(--surface-card)] border border-[var(--border-color)] shadow-xs hover:shadow-xl hover:border-[#6546DB]/40 transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  {imgSrc && (
+                    <div className="w-full h-44 rounded-2xl bg-[var(--bg-primary)] mb-4 overflow-hidden relative border border-[var(--border-color)]">
+                      <img src={imgSrc} alt={issue.title} className="w-full h-full object-cover" />
                     </div>
+                  )}
 
-                    <h3 className="font-bold text-lg mb-2 leading-snug">{issue.title}</h3>
-                    <p className={`text-xs mb-3 line-clamp-2 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-                      {issue.description}
-                    </p>
-
-                    <div className="flex items-center gap-1 text-xs text-indigo-500 font-semibold mb-4">
-                      <MapPin size={14} />
-                      <span>
-                        {issue.location?.building} {issue.location?.room ? `· Room ${issue.location.room}` : ""}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={`pt-4 border-t flex items-center justify-between text-xs ${isDark ? "border-slate-800" : "border-gray-100"}`}>
-                    <span className="text-gray-400 truncate max-w-[130px]">
-                      By {issue.reportedBy?.name || "Student"}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
+                      issue.status === "resolved"
+                        ? "bg-[#20B486]/10 text-[#20B486] border-[#20B486]/20"
+                        : issue.status === "in-progress"
+                        ? "bg-[#4D7CFE]/10 text-[#4D7CFE] border-[#4D7CFE]/20"
+                        : "bg-[#6546DB]/10 text-[#6546DB] border-[#6546DB]/20"
+                    }`}>
+                      {issue.status || "reported"}
                     </span>
 
-                    <button
-                      onClick={() => handleUpvote(issue._id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold border transition-all hover:scale-105 active:scale-95 bg-indigo-500/10 text-indigo-600 border-indigo-500/20 hover:bg-indigo-500/20"
-                    >
-                      <ThumbsUp size={13} />
-                      <span>{upvoteCount} Upvotes</span>
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => openEditModal(issue)}
+                        className="p-1.5 rounded-lg border border-[#6546DB]/20 bg-[#6546DB]/10 text-[#6546DB] hover:bg-[#6546DB] hover:text-white transition-all"
+                        title="Edit / Update Issue"
+                      >
+                        <Edit3 size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteIssue(issue._id)}
+                        className="p-1.5 rounded-lg border border-red-500/20 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                        title="Delete Issue Ticket"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <h3 className="font-bold text-base text-[var(--text-primary)] mb-1.5 leading-snug">{issue.title}</h3>
+                  <p className="text-xs text-[var(--text-secondary)] mb-3 line-clamp-2 leading-relaxed">
+                    {issue.description}
+                  </p>
+
+                  <div className="flex items-center gap-1 text-xs text-[#6546DB] font-semibold mb-4">
+                    <MapPin size={14} />
+                    <span>
+                      {issue.location?.building} {issue.location?.room ? `· Room ${issue.location.room}` : ""}
+                    </span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
 
-      {/* CREATE OR EDIT ISSUE MODAL */}
+                <div className="pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs">
+                  <span className="text-[var(--text-muted)] truncate max-w-[130px]">
+                    By {issue.reportedBy?.name || "Student"}
+                  </span>
+
+                  <button
+                    onClick={() => handleUpvote(issue._id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold border transition-all hover:scale-105 bg-[#6546DB]/10 text-[#6546DB] border-[#6546DB]/20 hover:bg-[#6546DB] hover:text-white"
+                  >
+                    <ThumbsUp size={13} />
+                    <span>{upvoteCount} Upvotes</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className={`w-full max-w-lg p-6 rounded-3xl border shadow-2xl relative max-h-[90vh] overflow-y-auto ${
-            isDark ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-amber-200 text-slate-900"
-          }`}>
+          <div className="w-full max-w-lg p-6 rounded-3xl bg-[var(--surface-card)] border border-[var(--border-color)] text-[var(--text-primary)] shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 dark:hover:text-white"
+              className="absolute top-5 right-5 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             >
               <X size={20} />
             </button>
 
-            <h2 className="text-2xl font-bold mb-1">
+            <h2 className="text-xl font-bold mb-1">
               {editingIssue ? "Edit Issue Ticket" : "Report Campus Issue"}
             </h2>
-            <p className="text-xs text-gray-500 mb-6">
+            <p className="text-xs text-[var(--text-secondary)] mb-5">
               Upload photos of broken equipment or maintenance issues.
             </p>
 
@@ -516,76 +462,61 @@ export default function Issues() {
               </div>
             )}
 
-            <form onSubmit={handleSubmitForm} className="flex flex-col gap-4">
-              {/* IMAGE UPLOAD FIELD */}
+            <form onSubmit={handleSubmitForm} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-semibold uppercase mb-1">Attach Photo Proof</label>
+                <label className="block font-semibold uppercase mb-1 text-[var(--text-secondary)]">Attach Photo Proof</label>
                 {imagePreview ? (
-                  <div className="relative w-full h-44 rounded-2xl overflow-hidden border mb-2 group">
+                  <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-[var(--border-color)] mb-2">
                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={removeImage}
                       className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white hover:bg-red-600 transition-colors"
-                      title="Remove Image"
                     >
                       <X size={16} />
                     </button>
                   </div>
                 ) : (
-                  <label className={`w-full h-32 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors ${
-                    isDark ? "border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-slate-400" : "border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-500"
-                  }`}>
-                    <Upload size={24} className="mb-2 text-indigo-500" />
-                    <span className="text-xs font-semibold">Click to upload photo</span>
+                  <label className="w-full h-32 border-2 border-dashed border-[var(--border-color)] rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-[var(--bg-primary)] hover:bg-[var(--surface-elevated)] text-[var(--text-muted)] transition-colors">
+                    <Upload size={24} className="mb-1.5 text-[#6546DB]" />
+                    <span className="font-semibold text-xs">Click to upload photo</span>
                     <span className="text-[10px] opacity-70">JPG, PNG, WEBP up to 5MB</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                   </label>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase mb-1">Issue Title *</label>
+                <label className="block font-semibold uppercase mb-1 text-[var(--text-secondary)]">Issue Title *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Broken AC in Central Library"
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
-                  className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    isDark ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200"
-                  }`}
+                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[#6546DB]/50"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase mb-1">Description *</label>
+                <label className="block font-semibold uppercase mb-1 text-[var(--text-secondary)]">Description *</label>
                 <textarea
                   required
                   rows={3}
-                  placeholder="Describe the malfunction or issue..."
+                  placeholder="Describe the malfunction..."
                   value={formDesc}
                   onChange={(e) => setFormDesc(e.target.value)}
-                  className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    isDark ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200"
-                  }`}
+                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[#6546DB]/50 resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold uppercase mb-1">Category *</label>
+                  <label className="block font-semibold uppercase mb-1 text-[var(--text-secondary)]">Category *</label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${
-                      isDark ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200"
-                    }`}
+                    className="w-full px-3 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:outline-none"
                   >
                     <option value="maintenance">Maintenance</option>
                     <option value="equipment">Lab Equipment</option>
@@ -595,79 +526,31 @@ export default function Issues() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase mb-1">Priority</label>
+                  <label className="block font-semibold uppercase mb-1 text-[var(--text-secondary)]">Priority</label>
                   <select
                     value={formPriority}
                     onChange={(e) => setFormPriority(e.target.value)}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${
-                      isDark ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200"
-                    }`}
+                    className="w-full px-3 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:outline-none"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="high">High Urgent</option>
                   </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold uppercase mb-1">Building / Block *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Science Block C"
-                    value={formBuilding}
-                    onChange={(e) => setFormBuilding(e.target.value)}
-                    className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${
-                      isDark ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200"
-                    }`}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold uppercase mb-1">Room / Floor</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Lab 302"
-                    value={formRoom}
-                    onChange={(e) => setFormRoom(e.target.value)}
-                    className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${
-                      isDark ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200"
-                    }`}
-                  />
-                </div>
-              </div>
-
-              {editingIssue && (
-                <div>
-                  <label className="block text-xs font-semibold uppercase mb-1">Issue Status</label>
-                  <select
-                    value={formStatus}
-                    onChange={(e) => setFormStatus(e.target.value)}
-                    className={`w-full px-3 py-2.5 rounded-xl border text-sm font-semibold focus:outline-none ${
-                      isDark ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200"
-                    }`}
-                  >
-                    <option value="reported">Reported</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                  </select>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-full text-xs font-semibold border hover:bg-gray-100 dark:hover:bg-slate-800"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-primary)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-full text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-[#6546DB] to-[#8E5AEF] text-white hover:opacity-95 shadow-md flex items-center gap-2"
                 >
                   {submitting && <Loader2 size={14} className="animate-spin" />}
                   {editingIssue ? "Save & Update Ticket" : "Submit Issue Ticket"}
@@ -677,6 +560,6 @@ export default function Issues() {
           </div>
         </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 }
