@@ -5,10 +5,6 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 
-app.use(
-  "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
-);
 
 const connectDB = require("./config/db");
 
@@ -22,7 +18,10 @@ connectDB();
 
 const app = express();
 
-
+app.use(
+  "/uploads",
+  express.static(path.join(process.cwd(), "uploads"))
+);
 app.use(
   cors({
     origin: process.env.CLIENT_URL,

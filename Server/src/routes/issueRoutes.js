@@ -6,7 +6,9 @@ const {
   createIssue,
   updateIssueStatus,
   toggleUpvote,
-  addComment
+  addComment,
+  findSimilarIssues,
+  getIssueStats
 } = require("../controllers/issueController");
 
 const {
@@ -46,6 +48,15 @@ router.post(
   "/:id/comments",
   protect,
   addComment
+);
+
+router.get("/duplicates", findSimilarIssues);
+
+router.get(
+  "/admin/stats",
+  protect,
+  adminOnly,
+  getIssueStats
 );
 
 module.exports = router;

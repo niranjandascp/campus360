@@ -290,6 +290,36 @@ const findSimilarIssues = async (req, res) => {
   }
 };
 
+const getIssueStats = async (req, res) => {
+  try {
+    const [
+      total,
+      reported,
+      inProgress,
+      resolved,
+      highPriority
+    ] = await Promise.all([
+      Issue.countDocuments(),
+      Issue.countDocuments({ status: "reported" }),
+      Issue.countDocuments({ status: "in-progress" }),
+      Issue.countDocuments({ status: "resolved" }),
+      Issue.countDocuments({ priority: "high" })
+    ]);
+
+    res.json({
+      total,
+      reported,
+      inProgress,
+      resolved,
+      highPriority
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllIssues,
   getIssueById,
@@ -297,5 +327,6 @@ module.exports = {
   updateIssueStatus,
   toggleUpvote,
   addComment,
-  findSimilarIssues
+  findSimilarIssues,
+  getIssueStats
 };
