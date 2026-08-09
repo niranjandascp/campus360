@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 export const loginUser = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/login`, {
@@ -6,10 +6,7 @@ export const loginUser = async (email, password) => {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      email,
-      password
-    })
+    body: JSON.stringify({ email, password })
   });
 
   return response.json();
@@ -21,31 +18,84 @@ export const registerUser = async (name, email, password) => {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      name,
-      email,
-      password
-    })
+    body: JSON.stringify({ name, email, password })
   });
 
   return response.json();
 };
 
-export const getIssues = async () => {
-  const response = await fetch(`${API_URL}/issues`);
+export const getIssues = async (params = {}) => {
+  const queryParams = new URLSearchParams();
+  if (params.status && params.status !== "all") queryParams.append("status", params.status);
+  if (params.category) queryParams.append("category", params.category);
+  if (params.search) queryParams.append("search", params.search);
+
+  const queryString = queryParams.toString();
+  const response = await fetch(`${API_URL}/issues${queryString ? `?${queryString}` : ""}`);
+  return response.json();
+};
+
+export const createIssue = async (issueData) => {
+  const token = localStorage.getItem("token");
+  let headers = {};
+  let body;
+
+  if (issueData instanceof FormData) {
+    body = issueData;
+    headers = {
+      Authorization: `Bearer ${token}`
+    };
+  } else {
+    body = JSON.stringify(issueData);
+    headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    };
+  }
+
+  const response = await fetch(`${API_URL}/issues`, {
+    method: "POST",
+    headers,
+    body
+  });
 
   return response.json();
 };
 
-export const createIssue = async (formData) => {
+export const updateIssue = async (issueId, issueData) => {
   const token = localStorage.getItem("token");
+  let headers = {};
+  let body;
 
-  const response = await fetch(`${API_URL}/issues`, {
-    method: "POST",
+  if (issueData instanceof FormData) {
+    body = issueData;
+    headers = {
+      Authorization: `Bearer ${token}`
+    };
+  } else {
+    body = JSON.stringify(issueData);
+    headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    };
+  }
+
+  const response = await fetch(`${API_URL}/issues/${issueId}`, {
+    method: "PUT",
+    headers,
+    body
+  });
+
+  return response.json();
+};
+
+export const deleteIssue = async (issueId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/issues/${issueId}`, {
+    method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`
-    },
-    body: formData
+    }
   });
 
   return response.json();
@@ -53,16 +103,13 @@ export const createIssue = async (formData) => {
 
 export const upvoteIssue = async (issueId) => {
   const token = localStorage.getItem("token");
-
-  const response = await fetch(
-    `${API_URL}/issues/${issueId}/upvote`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+  const response = await fetch(`${API_URL}/issues/${issueId}/upvote`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
     }
-  );
+  });
 
   return response.json();
 };

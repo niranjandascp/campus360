@@ -320,10 +320,70 @@ const getIssueStats = async (req, res) => {
   }
 };
 
+const updateIssue = async (req, res) => {
+  try {
+    const { title, description, category, building, room, priority, status } = req.body;
+    const issue = await Issue.findById(req.params.id);
+
+    if (!issue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+
+    if (issue.reportedBy.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to update this issue" });
+    }
+
+    if (title) issue.title = title;
+    if (description) issue.description = description;
+    if (category) issue.category = category;
+    if (building || room !== undefined) {
+      issue.location = {
+        building: building || issue.location?.building || "",
+        room: room !== undefined ? room : issue.location?.room || ""
+      };
+    }
+    if (priority) issue.priority = priority;
+    if (status) issue.status = status;
+    if (req.file) {
+      issue.imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    await issue.save();
+
+    const updatedIssue = await Issue.findById(issue._id)
+      .populate("reportedBy", "name email");
+
+    res.json({
+      message: "Issue updated successfully",
+      issue: updatedIssue
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteIssue = async (req, res) => {
+  try {
+    const issue = await Issue.findById(req.params.id);
+    if (!issue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+    if (issue.reportedBy.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized to delete this issue" });
+    }
+    await Issue.findByIdAndDelete(req.params.id);
+    res.json({ message: "Issue deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllIssues,
   getIssueById,
   createIssue,
+  updateIssue,
+  deleteIssue,
   updateIssueStatus,
   toggleUpvote,
   addComment,

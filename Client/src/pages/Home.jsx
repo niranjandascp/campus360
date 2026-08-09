@@ -25,13 +25,13 @@ import {
   Upload,
   Image as ImageIcon
 } from 'lucide-react';
-import { Tabs } from '@/components/ui/vercel-tabs';
+import { Navbar } from '@/components/ui/mini-navbar';
 
 const NAV_TABS = [
   { id: 'home', label: 'Home' },
-  { id: 'modules', label: 'Modules' },
-  { id: 'how-it-works', label: 'How it Works' },
-  { id: 'stats', label: 'Impact' },
+  { id: 'issues', label: 'Issues' },
+  { id: 'lost-found', label: 'Lost & Found' },
+  { id: 'event-hub', label: 'Event Hub' },
 ];
 
 const MODULES = [
@@ -162,6 +162,19 @@ function Home() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
+  // Theme state ('light' | 'dark')
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', next);
+      return next;
+    });
+  };
+
+  const isDark = theme === 'dark';
+  
   // Profile edit form
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
@@ -244,18 +257,20 @@ function Home() {
   return (
     <div
       style={{
-        '--ink': '#12192B',
-        '--paper': '#FBFAF6',
-        '--paper-dim': '#C7CADA',
-        '--gold': '#CB9A2E',
-        '--slate': '#3B5BA9',
-        '--line': '#E4E0D3',
+        '--ink': isDark ? '#F8FAFC' : '#12192B',
+        '--paper': isDark ? '#0B0F19' : '#FBFAF6',
+        '--paper-dim': isDark ? '#94A3B8' : '#C7CADA',
+        '--gold': isDark ? '#EAB308' : '#CB9A2E',
+        '--slate': isDark ? '#60A5FA' : '#3B5BA9',
+        '--line': isDark ? '#1E293B' : '#E4E0D3',
+        '--card-bg': isDark ? '#161E2E' : '#FFFFFF',
         '--font-display': "'Fraunces', 'Georgia', serif",
         '--font-body': "'Inter', system-ui, sans-serif",
         '--font-mono': "'IBM Plex Mono', 'Menlo', monospace",
         background: 'var(--paper)',
         fontFamily: 'var(--font-body)',
         color: 'var(--ink)',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
       }}
       className="min-h-screen w-full relative overflow-x-hidden"
     >
@@ -281,219 +296,14 @@ function Home() {
         }
       `}</style>
 
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md border-b transition-all duration-300" style={{ background: 'rgba(251,250,246,0.92)', borderColor: 'var(--line)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105" style={{ background: 'var(--ink)' }}>
-              <span style={{ color: 'var(--gold)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>C</span>
-            </div>
-            <span className="text-lg font-semibold tracking-tight" style={{ fontFamily: 'var(--font-display)', color: 'var(--ink)' }}>
-              Campus Connect
-            </span>
-          </Link>
-
-          {/* Desktop Navigation Links - Vercel Animated Tabs */}
-          <nav className="hidden md:flex items-center">
-            <Tabs tabs={NAV_TABS} onTabChange={handleTabChange} />
-          </nav>
-
-          {/* Auth Actions / User Profile */}
-          <div className="hidden md:flex items-center gap-3 relative">
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-full border bg-white hover:bg-gray-50 transition-all shadow-sm focus:outline-none"
-                  style={{ borderColor: 'var(--line)' }}
-                >
-                  {user.avatar ? (
-                    <img src={user.avatar} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-gray-200" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shadow-inner" style={{ background: 'var(--ink)', color: 'var(--gold)' }}>
-                      {user.name ? user.name.charAt(0) : 'U'}
-                    </div>
-                  )}
-                  <span className="text-sm font-semibold max-w-[120px] truncate" style={{ color: 'var(--ink)' }}>
-                    {user.name || 'Profile'}
-                  </span>
-                  <ChevronDown size={14} className={`transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} style={{ color: 'var(--ink)' }} />
-                </button>
-
-                {/* Profile Dropdown Menu */}
-                {profileDropdownOpen && (
-                  <div
-                    className="absolute right-0 mt-2 w-64 rounded-2xl border bg-white shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                    style={{ borderColor: 'var(--line)' }}
-                  >
-                    {/* User Header */}
-                    <div className="p-3 border-b mb-1 flex items-center gap-3" style={{ borderColor: 'var(--line)' }}>
-                      {user.avatar ? (
-                        <img src={user.avatar} alt="Profile" className="w-10 h-10 rounded-full object-cover border border-gray-200" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm uppercase shadow-inner flex-shrink-0" style={{ background: 'var(--ink)', color: 'var(--gold)' }}>
-                          {user.name ? user.name.charAt(0) : 'U'}
-                        </div>
-                      )}
-                      <div className="overflow-hidden">
-                        <p className="font-bold text-sm text-gray-900 truncate">{user.name}</p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                        <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">
-                          <ShieldCheck size={11} /> Verified Student
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Menu Options */}
-                    <button
-                      onClick={() => {
-                        setIsEditingProfile(true);
-                        setProfileDropdownOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-900 transition-colors"
-                    >
-                      <Edit3 size={16} className="text-indigo-600" />
-                      Edit Profile & Avatar
-                    </button>
-
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors mt-1"
-                    >
-                      <LogOut size={16} />
-                      Log Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <Link
-                  to="/signin"
-                  className="px-5 py-2.5 rounded-full font-semibold text-sm hover:opacity-80 transition-opacity"
-                  style={{ color: 'var(--ink)' }}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
-                  className="px-5 py-2.5 rounded-full font-semibold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] transition-all"
-                  style={{ background: 'var(--ink)', color: 'var(--paper)' }}
-                >
-                  Sign Up
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Hamburger Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-gray-700 hover:bg-black/5 transition-colors focus:outline-none flex items-center gap-2"
-            aria-label="Toggle Navigation Menu"
-          >
-            {user && (
-              user.avatar ? (
-                <img src={user.avatar} alt="Profile" className="w-7 h-7 rounded-full object-cover border border-gray-200" />
-              ) : (
-                <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs uppercase" style={{ background: 'var(--ink)', color: 'var(--gold)' }}>
-                  {user.name ? user.name.charAt(0) : 'U'}
-                </div>
-              )
-            )}
-            {mobileMenuOpen ? <X size={24} color="var(--ink)" /> : <Menu size={24} color="var(--ink)" />}
-          </button>
-        </div>
-
-        {/* Mobile Dropdown Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-b px-5 py-6 flex flex-col gap-4 animate-in slide-in-from-top duration-300" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
-            <Link
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-base font-semibold py-2 border-b"
-              style={{ borderColor: 'var(--line)', color: 'var(--ink)' }}
-            >
-              Home
-            </Link>
-            <a
-              href="#modules"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-base font-semibold py-2 border-b"
-              style={{ borderColor: 'var(--line)', color: 'var(--ink)' }}
-            >
-              Explore Modules
-            </a>
-            <a
-              href="#how-it-works"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-base font-semibold py-2 border-b"
-              style={{ borderColor: 'var(--line)', color: 'var(--ink)' }}
-            >
-              How it Works
-            </a>
-            <a
-              href="#stats"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-base font-semibold py-2 border-b"
-              style={{ borderColor: 'var(--line)', color: 'var(--ink)' }}
-            >
-              Our Impact
-            </a>
-            
-            {user ? (
-              <div className="pt-2 flex flex-col gap-3">
-                <div className="p-3 rounded-2xl bg-white border flex items-center gap-3" style={{ borderColor: 'var(--line)' }}>
-                  {user.avatar ? (
-                    <img src={user.avatar} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm uppercase shadow-inner" style={{ background: 'var(--ink)', color: 'var(--gold)' }}>
-                      {user.name ? user.name.charAt(0) : 'U'}
-                    </div>
-                  )}
-                  <div>
-                    <p className="font-bold text-sm text-gray-900">{user.name}</p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setIsEditingProfile(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full text-center py-3 rounded-full font-semibold text-sm border flex items-center justify-center gap-2"
-                  style={{ borderColor: 'var(--ink)', color: 'var(--ink)' }}
-                >
-                  <Edit3 size={16} /> Edit Profile & Image
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-center py-3 rounded-full font-semibold text-sm bg-red-50 text-red-600 border border-red-200 flex items-center justify-center gap-2"
-                >
-                  <LogOut size={16} /> Log Out
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3 mt-2">
-                <Link
-                  to="/signin"
-                  className="w-full text-center py-3 rounded-full font-semibold text-sm border"
-                  style={{ borderColor: 'var(--ink)', color: 'var(--ink)' }}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
-                  className="w-full text-center py-3 rounded-full font-semibold text-sm shadow-md"
-                  style={{ background: 'var(--ink)', color: 'var(--paper)' }}
-                >
-                  Sign Up Now
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-      </header>
+      {/* NAVBAR COMPONENT */}
+      <Navbar
+        user={user}
+        onLogout={handleLogout}
+        onEditProfile={() => setIsEditingProfile(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
 
       {/* EDIT PROFILE MODAL */}
       {isEditingProfile && (
@@ -645,7 +455,7 @@ function Home() {
       )}
 
       {/* HERO SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 lg:pt-28 pb-16 lg:pb-24 grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 lg:pt-36 pb-16 lg:pb-24 grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
         <div className="text-center md:text-left flex flex-col items-center md:items-start">
           <div
             className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 mb-6 text-xs font-medium border"
@@ -666,14 +476,14 @@ function Home() {
 
           <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             {user ? (
-              <a
-                href="#modules"
+              <Link
+                to="/issues"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all"
                 style={{ background: 'var(--slate)', color: 'var(--paper)' }}
               >
-                Go to Campus Board
+                Go to Issue Tracker
                 <ArrowRight size={16} />
-              </a>
+              </Link>
             ) : (
               <Link
                 to="/signup"
@@ -684,14 +494,14 @@ function Home() {
                 <ArrowRight size={16} />
               </Link>
             )}
-            <a
-              href="#modules"
+            <Link
+              to="/issues"
               className="inline-flex items-center gap-2 text-sm font-semibold cc-underline py-2"
               style={{ color: 'var(--ink)' }}
             >
-              Explore All Modules
+              Explore Features
               <ArrowUpRight size={15} />
-            </a>
+            </Link>
           </div>
 
           <div className="mt-10 flex items-center gap-4 text-xs font-medium" style={{ color: '#5A5F70' }}>
@@ -746,90 +556,74 @@ function Home() {
         </div>
       </section>
 
-      {/* MODULES GRID */}
-      <section id="modules" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="max-w-2xl mb-12 text-center sm:text-left">
-          <span className="text-xs tracking-[0.2em] uppercase font-semibold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--slate)' }}>
-            POWERFUL MODULES
+      {/* QUICK PORTAL NAVIGATION CARDS */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t" style={{ borderColor: 'var(--line)' }}>
+        <div className="text-center sm:text-left mb-12">
+          <span className="text-xs tracking-[0.2em] uppercase font-semibold text-indigo-500" style={{ fontFamily: 'var(--font-mono)' }}>
+            DIGITAL CAMPUS SUITE
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold mt-2" style={{ fontFamily: 'var(--font-display)' }}>
-            Six Core Services. One Unified Board.
+            Explore Dedicated Campus Portals
           </h2>
-          <p className="mt-3 text-base leading-relaxed" style={{ color: '#4B5163' }}>
-            No more buried messaging threads or unorganized group chats. Everything is indexed, tracked, and accessible in real-time.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {MODULES.map((m) => (
-            <div
-              key={m.name}
-              onClick={() => setSelectedModule(selectedModule === m.name ? null : m.name)}
-              className={`cc-card relative rounded-2xl border p-6 sm:p-7 cursor-pointer transition-all ${
-                selectedModule === m.name ? 'ring-2 ring-[var(--gold)] border-transparent bg-white shadow-xl' : ''
-              }`}
-              style={{ borderColor: 'var(--line)', background: selectedModule === m.name ? '#FFFFFF' : 'var(--paper)' }}
-            >
-              <span className="cc-pin" style={{ background: 'var(--gold)' }} />
-              
-              <div className="flex items-center justify-between mb-5">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-inner" style={{ background: 'var(--ink)' }}>
-                  <m.icon size={22} color="var(--gold)" />
-                </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-md" style={{ fontFamily: 'var(--font-mono)', background: 'rgba(59,91,169,0.1)', color: 'var(--slate)' }}>
-                  {m.tag}
-                </span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Link
+            to="/issues"
+            className="p-8 rounded-3xl border transition-all hover:scale-[1.02] hover:shadow-2xl flex flex-col justify-between group"
+            style={{ borderColor: 'var(--line)', background: 'var(--card-bg)' }}
+          >
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Wrench size={24} />
               </div>
-
-              <h3 className="text-xl font-bold mb-2 flex items-center justify-between" style={{ fontFamily: 'var(--font-display)' }}>
-                {m.name}
-                <ChevronRight size={18} className={`transition-transform ${selectedModule === m.name ? 'rotate-90 text-[var(--gold)]' : 'text-gray-400'}`} />
-              </h3>
-
-              <p className="text-sm leading-relaxed" style={{ color: '#5A5F70' }}>
-                {m.copy}
+              <h3 className="text-2xl font-bold mb-2">Issue Tracker</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Report broken equipment, maintenance issues, or dorm repairs with real-time status tracking.
               </p>
-
-              <div className="mt-6 pt-4 border-t flex items-center justify-between text-xs font-semibold" style={{ borderColor: 'var(--line)' }}>
-                <span style={{ color: 'var(--slate)', fontFamily: 'var(--font-mono)' }}>{m.highlight}</span>
-                <span className="text-xs font-bold underline" style={{ color: 'var(--ink)' }}>
-                  {selectedModule === m.name ? 'Close' : 'Quick Details'}
-                </span>
-              </div>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-indigo-600">
+              Open Portal <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
 
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" className="py-16 sm:py-24 border-t" style={{ borderColor: 'var(--line)', background: '#F5F2E9' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center sm:text-left mb-12">
-            <span className="text-xs tracking-[0.2em] uppercase font-semibold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--slate)' }}>
-              SIMPLE WORKFLOW
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold mt-2" style={{ fontFamily: 'var(--font-display)' }}>
-              Get Started in Three Minutes
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {STEPS.map((s) => (
-              <div key={s.n} className="bg-white/60 backdrop-blur-sm rounded-2xl p-7 border relative flex flex-col justify-between" style={{ borderColor: 'var(--line)' }}>
-                <div>
-                  <span className="text-5xl font-bold block mb-4" style={{ fontFamily: 'var(--font-display)', color: 'var(--gold)', opacity: 0.7 }}>
-                    {s.n}
-                  </span>
-                  <h3 className="text-xl font-bold mb-3" style={{ fontFamily: 'var(--font-display)' }}>
-                    {s.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: '#5A5F70' }}>
-                    {s.copy}
-                  </p>
-                </div>
+          <Link
+            to="/lost-found"
+            className="p-8 rounded-3xl border transition-all hover:scale-[1.02] hover:shadow-2xl flex flex-col justify-between group"
+            style={{ borderColor: 'var(--line)', background: 'var(--card-bg)' }}
+          >
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <MapPin size={24} />
               </div>
-            ))}
-          </div>
+              <h3 className="text-2xl font-bold mb-2">Lost & Found</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Reclaim lost student IDs, keys, backpacks, or report misplaced items across campus.
+              </p>
+            </div>
+            <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-emerald-600">
+              Open Portal <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+
+          <Link
+            to="/event-hub"
+            className="p-8 rounded-3xl border transition-all hover:scale-[1.02] hover:shadow-2xl flex flex-col justify-between group"
+            style={{ borderColor: 'var(--line)', background: 'var(--card-bg)' }}
+          >
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <CalendarDays size={24} />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Event Hub</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Discover university fests, hackathons, workshops, and club activities with 1-click RSVP.
+              </p>
+            </div>
+            <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-purple-600">
+              Open Portal <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
         </div>
       </section>
 

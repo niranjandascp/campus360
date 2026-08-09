@@ -4,6 +4,8 @@ const {
   getAllIssues,
   getIssueById,
   createIssue,
+  updateIssue,
+  deleteIssue,
   updateIssueStatus,
   toggleUpvote,
   addComment,
@@ -29,6 +31,19 @@ router.post(
   protect,
   upload.single("image"),
   createIssue
+);
+
+router.put(
+  "/:id",
+  protect,
+  upload.single("image"),
+  updateIssue
+);
+
+router.delete(
+  "/:id",
+  protect,
+  deleteIssue
 );
 
 router.patch(
