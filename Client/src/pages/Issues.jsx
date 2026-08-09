@@ -80,8 +80,8 @@ export default function Issues() {
     setLoading(true);
     try {
       const res = await getIssues({ status: filter, search: searchTerm });
-      if (res && res.issues) {
-        setIssuesList(res.issues.length > 0 ? res.issues : demoIssues);
+      if (res && Array.isArray(res.issues)) {
+        setIssuesList(res.issues);
       } else {
         setIssuesList(demoIssues);
       }
@@ -266,6 +266,8 @@ export default function Issues() {
     if (!window.confirm("Are you sure you want to delete this issue ticket?")) return;
 
     setIssuesList((prev) => prev.filter((item) => item._id !== issueId));
+
+    if (String(issueId).startsWith("demo")) return;
 
     try {
       await deleteIssue(issueId);

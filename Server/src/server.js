@@ -13,6 +13,7 @@ const path = require("path");
 const homeRoutes = require("./routes/homeRoutes");
 const authRoutes = require("./routes/authRoutes");
 const issueRoutes = require("./routes/issueRoutes");
+const lostFoundRoutes = require("./routes/lostFoundRoutes");
 
 connectDB();
 
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", homeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/issues", issueRoutes);
+app.use("/api/lost-found", lostFoundRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
