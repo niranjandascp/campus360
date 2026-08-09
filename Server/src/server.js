@@ -16,6 +16,7 @@ const lostFoundRoutes = require("./routes/lostFoundRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const eventRoutes = require("./routes/eventRoutes");
 const { initSocket } = require("./socket");
 
 const User = require("./models/User");
@@ -70,6 +71,7 @@ app.use("/", homeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/issues", issueRoutes);
 app.use("/api/lost-found", lostFoundRoutes);
+app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", messageRoutes);

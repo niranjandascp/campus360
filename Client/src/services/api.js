@@ -235,6 +235,101 @@ export const updateLostFoundStatus = async (itemId, status) => {
   return response.json();
 };
 
+// --- EVENT HUB APIS ---
+export const getEvents = async (params = {}) => {
+  const queryParams = new URLSearchParams();
+  if (params.category && params.category !== "all") queryParams.append("category", params.category);
+  if (params.search) queryParams.append("search", params.search);
+
+  const queryString = queryParams.toString();
+  const response = await fetch(`${API_URL}/events${queryString ? `?${queryString}` : ""}`);
+  return response.json();
+};
+
+export const getEventById = async (eventId) => {
+  const response = await fetch(`${API_URL}/events/${eventId}`);
+  return response.json();
+};
+
+export const createEvent = async (eventData) => {
+  const token = localStorage.getItem("token");
+  let headers = {};
+  let body;
+
+  if (eventData instanceof FormData) {
+    body = eventData;
+    headers = {
+      Authorization: `Bearer ${token}`
+    };
+  } else {
+    body = JSON.stringify(eventData);
+    headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    };
+  }
+
+  const response = await fetch(`${API_URL}/events`, {
+    method: "POST",
+    headers,
+    body
+  });
+
+  return response.json();
+};
+
+export const updateEvent = async (eventId, eventData) => {
+  const token = localStorage.getItem("token");
+  let headers = {};
+  let body;
+
+  if (eventData instanceof FormData) {
+    body = eventData;
+    headers = {
+      Authorization: `Bearer ${token}`
+    };
+  } else {
+    body = JSON.stringify(eventData);
+    headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    };
+  }
+
+  const response = await fetch(`${API_URL}/events/${eventId}`, {
+    method: "PUT",
+    headers,
+    body
+  });
+
+  return response.json();
+};
+
+export const deleteEvent = async (eventId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/events/${eventId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.json();
+};
+
+export const toggleEventRsvp = async (eventId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/events/${eventId}/rsvp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.json();
+};
+
 // --- MESSAGING APIS ---
 export const getConversations = async () => {
   const token = localStorage.getItem("token");
