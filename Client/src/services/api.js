@@ -1,5 +1,13 @@
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
+export const getDashboardStats = async () => {
+  try {
+    const response = await fetch(`${API_URL}/stats`);
+    return await response.json();
+  } catch (err) {
+    return null;
+  }
+};
 // --- AUTH APIS ---
 export const loginUser = async (email, password) => {
   try {

@@ -7,9 +7,17 @@ import {
 } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 
+import { getDashboardStats } from "@/services/api";
+
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [stats, setStats] = useState({
+    studentsCount: 0,
+    issuesResolved: 0,
+    itemsRecovered: 0,
+    eventsCount: 0
+  });
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -20,6 +28,18 @@ export default function Home() {
         setUser(null);
       }
     }
+
+    // Fetch live dashboard stats
+    getDashboardStats().then(data => {
+      if (data) {
+        setStats({
+          studentsCount: data.studentsCount || 0,
+          issuesResolved: data.issuesResolved || 0,
+          itemsRecovered: data.itemsRecovered || 0,
+          eventsCount: data.eventsCount || 0
+        });
+      }
+    });
   }, []);
 
   const handleLogout = () => {
@@ -29,10 +49,10 @@ export default function Home() {
   };
 
   const quickStats = [
-    { label: "Active Students", value: "2,400+", change: "+12% this week", color: "text-[#6546DB]", bg: "bg-[#6546DB]/10" },
-    { label: "Issues Resolved", value: "180+", change: "98% resolution rate", color: "text-[#20B486]", bg: "bg-[#20B486]/10" },
-    { label: "Lost & Found Recovered", value: "640+", change: "Within 24 hours", color: "text-[#F0A34A]", bg: "bg-[#F0A34A]/10" },
-    { label: "Campus Clubs & Fests", value: "45+", change: "120+ Upcoming Events", color: "text-[#4D7CFE]", bg: "bg-[#4D7CFE]/10" },
+    { label: "Active Students", value: stats.studentsCount > 0 ? `${stats.studentsCount}+` : "2,400+", change: "+12% this week", color: "text-[#6546DB]", bg: "bg-[#6546DB]/10" },
+    { label: "Issues Resolved", value: stats.issuesResolved > 0 ? `${stats.issuesResolved}+` : "180+", change: "98% resolution rate", color: "text-[#20B486]", bg: "bg-[#20B486]/10" },
+    { label: "Lost & Found Recovered", value: stats.itemsRecovered > 0 ? `${stats.itemsRecovered}+` : "640+", change: "Within 24 hours", color: "text-[#F0A34A]", bg: "bg-[#F0A34A]/10" },
+    { label: "Campus Clubs & Fests", value: stats.eventsCount > 0 ? `${stats.eventsCount}+` : "45+", change: "120+ Upcoming Events", color: "text-[#4D7CFE]", bg: "bg-[#4D7CFE]/10" },
   ];
 
   const modules = [
