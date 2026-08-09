@@ -184,6 +184,23 @@ export default function DashboardLayout({ children, user, onLogout, activeNav })
               </button>
             </div>
           )}
+
+          {!user && (
+            <div className="flex flex-col gap-2 pt-2">
+              <Link 
+                to="/signin" 
+                className="w-full py-2 text-center text-xs font-bold text-white rounded-xl bg-gradient-to-r from-[#6546DB] to-[#8E5AEF] hover:opacity-90 transition-opacity shadow-md shadow-[#6546DB]/20"
+              >
+                Sign In
+              </Link>
+              <Link 
+                to="/signup" 
+                className="w-full py-2 text-center text-xs font-bold text-[#B7B8C9] rounded-xl border border-[#252744] bg-[#181A35] hover:bg-[#252744] hover:text-white transition-all"
+              >
+                Create Account
+              </Link>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -270,6 +287,25 @@ export default function DashboardLayout({ children, user, onLogout, activeNav })
                 <button onClick={onLogout} className="text-red-400 p-2">
                   <LogOut size={16} />
                 </button>
+              </div>
+            )}
+
+            {!user && (
+              <div className="pt-4 border-t flex flex-col gap-2" style={{ borderColor: "#252744" }}>
+                <Link 
+                  to="/signin" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 text-center text-xs font-bold text-white rounded-xl bg-gradient-to-r from-[#6546DB] to-[#8E5AEF]"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  to="/signup" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 text-center text-xs font-bold text-[#B7B8C9] rounded-xl border border-[#252744] bg-[#181A35]"
+                >
+                  Create Account
+                </Link>
               </div>
             )}
           </div>

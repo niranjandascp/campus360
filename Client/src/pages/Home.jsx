@@ -217,7 +217,7 @@ export default function Home() {
       {/* ANNOUNCEMENTS & WORKFLOW SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Campus Live Bulletin */}
-        <div className="lg:col-span-7 p-6 rounded-3xl bg-[var(--surface-card)] border border-[var(--border-color)] shadow-xs">
+        {/* <div className="lg:col-span-7 p-6 rounded-3xl bg-[var(--surface-card)] border border-[var(--border-color)] shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-[#6546DB]" />
@@ -242,10 +242,10 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Workflow Overview */}
-        <div className="lg:col-span-5 p-6 rounded-3xl bg-[var(--surface-card)] border border-[var(--border-color)] shadow-xs">
+        {/* <div className="lg:col-span-5 p-6 rounded-3xl bg-[var(--surface-card)] border border-[var(--border-color)] shadow-xs">
           <div className="flex items-center gap-2 mb-4">
             <ShieldCheck className="w-4 h-4 text-[#20B486]" />
             <h3 className="font-bold text-sm text-[var(--text-primary)]">Verified Campus Workflow</h3>
@@ -282,7 +282,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </DashboardLayout>
   );
