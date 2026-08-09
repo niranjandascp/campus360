@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Issues from "./pages/Issues";
 import LostFound from "./pages/LostFound";
 import EventHub from "./pages/EventHub";
+import MessagesPage from "./pages/MessagesPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/issues" element={<Issues />} />
         <Route path="/lost-found" element={<LostFound />} />
         <Route path="/event-hub" element={<EventHub />} />
+        <Route path="/messages" element={<MessagesPage />} />
         <Route path="/signin" element={<Login />} />
         <Route path="/signup" element={<Register />} />
         

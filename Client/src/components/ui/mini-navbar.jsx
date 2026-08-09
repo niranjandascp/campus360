@@ -19,6 +19,7 @@ const NAV_TABS = [
   { id: "issues", label: "Issues" },
   { id: "lost-found", label: "Lost & Found" },
   { id: "event-hub", label: "Event Hub" },
+  { id: "messages", label: "Messages" }
 ];
 
 export function Navbar({ user, onLogout, onEditProfile, activeTab = "home", theme = "light", onToggleTheme }) {
@@ -42,6 +43,7 @@ export function Navbar({ user, onLogout, onEditProfile, activeTab = "home", them
     else if (tabId === "issues") navigate("/issues");
     else if (tabId === "lost-found") navigate("/lost-found");
     else if (tabId === "event-hub") navigate("/event-hub");
+    else if (tabId === "messages") navigate("/messages");
   };
 
   return (
@@ -245,6 +247,13 @@ export function Navbar({ user, onLogout, onEditProfile, activeTab = "home", them
               className="text-sm font-semibold py-2 border-b border-opacity-20"
             >
               Event Hub
+            </Link>
+            <Link
+              to="/messages"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-sm font-semibold py-2 border-b border-opacity-20"
+            >
+              Messages
             </Link>
 
             {user ? (

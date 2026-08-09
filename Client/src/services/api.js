@@ -207,3 +207,69 @@ export const claimLostFound = async (itemId) => {
 
   return response.json();
 };
+
+// --- MESSAGING APIS ---
+export const getConversations = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/conversations`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
+
+export const getConversationUsers = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/conversations/users`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
+
+export const createConversation = async (otherUserId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/conversations`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ otherUserId })
+  });
+  return response.json();
+};
+
+export const getMessages = async (conversationId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/conversations/${conversationId}/messages`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
+
+export const deleteConversation = async (conversationId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/conversations/${conversationId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
+
+export const deleteSingleMessage = async (messageId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/messages/${messageId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
