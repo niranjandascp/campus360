@@ -20,6 +20,8 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
+      role,
+      userId,
       department,
       year
     } = req.body;
@@ -42,14 +44,11 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
+      role: role || "student",
+      userId: userId || `CMP-${Math.floor(100000 + Math.random() * 900000)}`,
       department,
       year
     });
-
-    if (!user.userId) {
-      user.userId = `CMP-${Math.floor(100000 + Math.random() * 900000)}`;
-      await user.save();
-    }
 
     res.status(201).json({
       message: "Registration successful",

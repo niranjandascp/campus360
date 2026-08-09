@@ -7,6 +7,10 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("Student");
+  const [studentId, setStudentId] = useState("");
+  const [department, setDepartment] = useState("");
+  const [year, setYear] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -16,7 +20,7 @@ function Register() {
     setLoading(true);
     setError("");
     try {
-      const data = await registerUser(name, email, password);
+      const data = await registerUser(name, email, password, role, studentId, department, year);
       if (data.token || data.user || data.message === "User registered successfully" || !data.error) {
         if (data.token) {
           localStorage.setItem("token", data.token);
@@ -30,6 +34,16 @@ function Register() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDemoFill = () => {
+    setName("Arjun Menon");
+    setEmail("arjun.menon@campus360.demo");
+    setPassword("Campus@123");
+    setRole("Student");
+    setStudentId("C3602026001");
+    setDepartment("BCA");
+    setYear("2nd Year");
   };
 
   return (
@@ -121,6 +135,64 @@ function Register() {
             </div>
           </div>
 
+          {/* <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-semibold text-[#B7B8C9] uppercase tracking-wider mb-1">
+                Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl text-xs bg-[#080A18] border border-[#252744] text-white focus:outline-none focus:ring-2 focus:ring-[#6546DB]/50 transition-all"
+              >
+                <option value="Student">Student</option>
+                <option value="Faculty">Faculty</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-[10px] font-semibold text-[#B7B8C9] uppercase tracking-wider mb-1">
+                Student / ID
+              </label>
+              <input
+                type="text"
+                required
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl text-xs bg-[#080A18] border border-[#252744] text-white placeholder-[#77798F] focus:outline-none focus:ring-2 focus:ring-[#6546DB]/50 transition-all"
+                placeholder="C3602026001"
+              />
+            </div>
+          </div> */}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-semibold text-[#B7B8C9] uppercase tracking-wider mb-1">
+                Department
+              </label>
+              <input
+                type="text"
+                required
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl text-xs bg-[#080A18] border border-[#252744] text-white placeholder-[#77798F] focus:outline-none focus:ring-2 focus:ring-[#6546DB]/50 transition-all"
+                placeholder="BCA"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-semibold text-[#B7B8C9] uppercase tracking-wider mb-1">
+                Year
+              </label>
+              <input
+                type="text"
+                required
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl text-xs bg-[#080A18] border border-[#252744] text-white placeholder-[#77798F] focus:outline-none focus:ring-2 focus:ring-[#6546DB]/50 transition-all"
+                placeholder="2nd Year"
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -136,15 +208,22 @@ function Register() {
           </button>
         </form>
 
-        {/* SOCIAL SIGN UP */}
+        {/* SOCIAL SIGN UP & DEMO */}
         <div className="pt-1">
-          <div className="relative flex items-center justify-center mb-3">
+          <div className="relative flex items-center justify-center mb-4 mt-2">
             <div className="border-t border-[#252744] w-full" />
             <span className="bg-[#11132A] px-3 text-[10px] text-[#77798F] font-semibold uppercase absolute">
-              Or Register With
+              Quick Setup
             </span>
           </div>
 
+          <button
+            type="button"
+            onClick={handleDemoFill}
+            className="w-full py-2.5 px-3 rounded-xl border border-[#F0A34A]/30 bg-[#F0A34A]/10 text-xs font-bold text-[#F0A34A] hover:bg-[#F0A34A]/20 transition-all flex items-center justify-center gap-2"
+          >
+            <Sparkles size={14} /> Auto-fill Demo Credentials
+          </button>
         </div>
 
         {/* FOOTER LINK */}
