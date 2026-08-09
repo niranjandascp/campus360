@@ -362,10 +362,10 @@ export default function MessagesPage() {
                   const isOnline = onlineUsers.includes(other._id);
 
                   return (
-                    <button
+                    <div
                       key={conv._id}
                       onClick={() => selectConversation(conv)}
-                      className={`w-full text-left p-4 flex items-center justify-between group transition-colors ${
+                      className={`w-full text-left p-4 flex items-center justify-between group transition-colors cursor-pointer ${
                         isActive
                           ? isDark
                             ? "bg-slate-800"
@@ -375,7 +375,7 @@ export default function MessagesPage() {
                           : "hover:bg-amber-50/50"
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="relative shrink-0">
                           <div
                             className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-white shadow-sm"
@@ -408,12 +408,12 @@ export default function MessagesPage() {
 
                       <button
                         onClick={(e) => handleDeleteConversation(conv._id, e)}
-                        className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0"
+                        className="p-2 rounded-lg text-red-500 hover:bg-red-500/20 opacity-80 group-hover:opacity-100 transition-opacity ml-2 shrink-0 z-10"
                         title="Delete Conversation"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={15} />
                       </button>
-                    </button>
+                    </div>
                   );
                 })
               )}
@@ -517,10 +517,10 @@ export default function MessagesPage() {
 
                             <button
                               onClick={(e) => handleDeleteMessage(msg._id, e)}
-                              className="opacity-0 group-hover:opacity-100 p-1 text-red-400 hover:text-red-600 transition-opacity shrink-0"
+                              className="opacity-60 hover:opacity-100 p-1 text-red-500 hover:bg-red-500/10 rounded-full transition-all shrink-0 ml-1"
                               title="Delete Message"
                             >
-                              <Trash2 size={12} />
+                              <Trash2 size={13} />
                             </button>
                           </div>
 

@@ -15,14 +15,24 @@ const issueSchema = new mongoose.Schema(
 
     category: {
       type: String,
+      lowercase: true,
+      trim: true,
       enum: [
         "wifi",
+        "electricity font",
         "electricity",
+        "electrical",
         "water",
+        "plumbing",
+        "maintenance",
         "cleanliness",
         "classroom",
         "laboratory",
+        "equipment",
         "furniture",
+        "security",
+        "hostel",
+        "academic",
         "other"
       ],
       required: true
@@ -47,8 +57,9 @@ const issueSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["reported", "in-progress", "resolved"],
-      default: "reported"
+      lowercase: true,
+      enum: ["open", "reported", "in-progress", "resolved"],
+      default: "open"
     },
 
     priority: {

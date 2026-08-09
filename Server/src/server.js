@@ -14,9 +14,35 @@ const authRoutes = require("./routes/authRoutes");
 const issueRoutes = require("./routes/issueRoutes");
 const lostFoundRoutes = require("./routes/lostFoundRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const { initSocket } = require("./socket");
 
-connectDB();
+const User = require("./models/User");
+
+connectDB().then(() => {
+  seedAdminUser();
+});
+
+const seedAdminUser = async () => {
+  try {
+    const adminExists = await User.findOne({ email: "admin@campus360.edu" });
+    if (!adminExists) {
+      await User.create({
+        name: "System Administrator",
+        email: "admin@campus360.edu",
+        password: "admin123",
+        role: "admin",
+        userId: "CMP-888888",
+        department: "Administration",
+        year: "Faculty"
+      });
+      console.log("👑 Default Admin Account created: admin@campus360.edu / admin123");
+    }
+  } catch (err) {
+    console.error("Error seeding default admin:", err.message);
+  }
+};
 
 const app = express();
 const server = http.createServer(app);
@@ -44,6 +70,8 @@ app.use("/", homeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/issues", issueRoutes);
 app.use("/api/lost-found", lostFoundRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api", messageRoutes);
 
 app.use((req, res) => {

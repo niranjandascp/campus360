@@ -13,6 +13,18 @@ export const loginUser = async (email, password) => {
   return response.json();
 };
 
+export const adminLoginUser = async (email, password) => {
+  const response = await fetch(`${API_URL}/auth/admin-login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  return response.json();
+};
+
 export const registerUser = async (name, email, password) => {
   const response = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
@@ -129,6 +141,8 @@ export const getLostFound = async (params = {}) => {
   return response.json();
 };
 
+export const getLostFoundItems = getLostFound;
+
 export const createLostFound = async (itemData) => {
   const token = localStorage.getItem("token");
   let headers = {};
@@ -208,6 +222,19 @@ export const claimLostFound = async (itemId) => {
   return response.json();
 };
 
+export const updateLostFoundStatus = async (itemId, status) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/lost-found/${itemId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+  return response.json();
+};
+
 // --- MESSAGING APIS ---
 export const getConversations = async () => {
   const token = localStorage.getItem("token");
@@ -270,6 +297,123 @@ export const deleteSingleMessage = async (messageId) => {
     headers: {
       Authorization: `Bearer ${token}`
     }
+  });
+  return response.json();
+};
+
+export const searchUsers = async (query = "", department = "", role = "") => {
+  const token = localStorage.getItem("token");
+  const params = new URLSearchParams();
+  if (query) params.append("q", query);
+  if (department) params.append("department", department);
+  if (role) params.append("role", role);
+
+  const response = await fetch(`${API_URL}/users/search?${params.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
+
+export const getCurrentUserProfile = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/users/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
+
+export const getUserProfile = async (identifier) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/users/${identifier}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.json();
+};
+
+export const updateUserProfile = async (profileData) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/users/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(profileData)
+  });
+  return response.json();
+};
+
+export const getAdminStats = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/admin/stats`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.json();
+};
+
+export const getAdminUsers = async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/admin/users`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.json();
+};
+
+export const updateUserRole = async (userId, role) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/admin/users/${userId}/role`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ role })
+  });
+  return response.json();
+};
+
+export const deleteUserAccount = async (userId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.json();
+};
+
+export const adminUpdateIssueStatus = async (issueId, status) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/admin/issues/${issueId}/status`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+  return response.json();
+};
+
+export const adminDeleteIssue = async (issueId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/admin/issues/${issueId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.json();
+};
+
+export const adminDeleteLostFound = async (itemId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/admin/lost-found/${itemId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
   });
   return response.json();
 };

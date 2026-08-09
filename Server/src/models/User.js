@@ -38,6 +38,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["student", "admin"],
       default: "student"
+    },
+
+    userId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true
     }
   },
   {
@@ -46,6 +53,11 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
+  if (!this.userId) {
+    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+    this.userId = `CMP-${randomSuffix}`;
+  }
+
   if (!this.isModified("password")) {
     return next();
   }

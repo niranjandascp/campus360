@@ -7,6 +7,9 @@ import Issues from "./pages/Issues";
 import LostFound from "./pages/LostFound";
 import EventHub from "./pages/EventHub";
 import MessagesPage from "./pages/MessagesPage";
+import ProfilePage from "./pages/ProfilePage";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   return (
@@ -17,6 +20,12 @@ function App() {
         <Route path="/lost-found" element={<LostFound />} />
         <Route path="/event-hub" element={<EventHub />} />
         <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/:identifier" element={<ProfilePage />} />
+        <Route path="/users" element={<ProfilePage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/signin" element={<Login />} />
         <Route path="/signup" element={<Register />} />
         

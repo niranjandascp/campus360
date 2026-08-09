@@ -7,6 +7,7 @@ import {
   User,
   LogOut,
   Edit3,
+  Shield,
   ShieldCheck,
   Sparkles,
   Sun,
@@ -147,6 +148,19 @@ export function Navbar({ user, onLogout, onEditProfile, activeTab = "home", them
 
                       <button
                         onClick={() => {
+                          navigate("/profile");
+                          setProfileDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                          isDark ? "text-slate-200 hover:bg-slate-800 hover:text-white" : "text-gray-700 hover:bg-indigo-50 hover:text-indigo-900"
+                        }`}
+                      >
+                        <User size={16} className={isDark ? "text-indigo-400" : "text-indigo-600"} />
+                        User Finder & Profile
+                      </button>
+
+                      <button
+                        onClick={() => {
                           onEditProfile?.();
                           setProfileDropdownOpen(false);
                         }}
@@ -155,7 +169,7 @@ export function Navbar({ user, onLogout, onEditProfile, activeTab = "home", them
                         }`}
                       >
                         <Edit3 size={16} className={isDark ? "text-indigo-400" : "text-indigo-600"} />
-                        Edit Profile & Avatar
+                        Edit Profile
                       </button>
 
                       <button
